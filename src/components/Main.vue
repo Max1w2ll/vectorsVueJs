@@ -1,5 +1,5 @@
 <template>
-  <div class="mainWindow">
+  <div id="mainWindow" class="mainWindow">
     <div class="header"></div>
 
     <div class="leftSidePanel"> 
@@ -11,6 +11,7 @@
       </div>
     </div>
 
+    <div id="sceneHolder" class="sceneHolder"></div>
 
     <div class="rightSidePanel"> 
       <div class="header">
@@ -86,10 +87,66 @@
 </template>
 
 <script>
+import * as THREE from 'three';
+
 export default {
   name: 'Main',
-}
 
+  data() {
+    return {
+
+    }
+  },
+
+  mounted() {
+    this.createScene();
+  },
+
+  methods: {
+    createScene() {
+      // Create Scene and camera
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+      // Set sizes and place it in sceneHolder
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize( window.innerWidth, window.innerHeight );
+      const sceneHolder = document.querySelector('#sceneHolder');
+      sceneHolder.appendChild( renderer.domElement );
+
+      this.createGrid(scene);
+
+      camera.position.z = 60;
+
+      function animate() {
+        requestAnimationFrame( animate );
+        renderer.render( scene, camera );
+
+        // cube.rotation.x += 0.05;
+        // cube.rotation.y += 0.05;
+
+      }
+      animate();
+
+    },
+
+    createGrid(scene) {
+      //Create X line
+      const matX = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+
+      const points = [];
+      points.push( new THREE.Vector3( -50, 0, 0 ) );
+      points.push( new THREE.Vector3( 50, 0, 0 ) );
+
+      const geometry = new THREE.BufferGeometry().setFromPoints( points );
+      const line = new THREE.Line( geometry, matX );
+
+      // TO DO: CREATE Y and Z lines
+
+      scene.add( line );
+    }
+  }
+}
 
 </script>
 
@@ -144,14 +201,15 @@ export default {
   /* Left side panel */
 
   .leftSidePanel {
+    top: 42px;
+    left: 0;
+
+    position: absolute;
+
     height: 100%;
     width: 250px;
 
     background: var(--panel-main-background);
-  }
-
-  .leftSidePanel .header {
-    margin-top: 2px;
   }
 
   .titleAndImage {
@@ -173,6 +231,13 @@ export default {
 
     filter: invert(49%) sepia(72%) saturate(5010%) hue-rotate(171deg) brightness(100%) contrast(104%);
   }
+
+  /* Main section */
+
+  .sceneHolder {
+    background: #009cd8;
+  }
+
 
   /* Right side panel */
 

@@ -35,14 +35,14 @@
 
           <div class="coordinateInputs">
             <div class="coordinatesBegin">
-              <input>
-              <input>
-              <input>
+              <input placeholder="X1-B">
+              <input placeholder="Y1-B">
+              <input placeholder="Z1-B">
             </div>
             <div class="coordinatesEnd">
-              <input>
-              <input>
-              <input>
+              <input placeholder="X1-E">
+              <input placeholder="Y1-E">
+              <input placeholder="Z1-E">
             </div>
           </div>
 
@@ -54,14 +54,14 @@
 
           <div class="coordinateInputs">
             <div class="coordinatesBegin">
-              <input>
-              <input>
-              <input>
+              <input placeholder="X2-B">
+              <input placeholder="Y2-B">
+              <input placeholder="Z2-B">
             </div>
             <div class="coordinatesEnd">
-              <input>
-              <input>
-              <input>
+              <input placeholder="X2-E">
+              <input placeholder="Y2-E">
+              <input placeholder="Z2-E">
             </div>
           </div>
         </div>
@@ -88,60 +88,82 @@
 
 <script>
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+const renderer = new THREE.WebGLRenderer();
+const controls = new OrbitControls( camera, renderer.domElement );
 
 export default {
   name: 'Main',
 
   data() {
     return {
-
     }
   },
 
   mounted() {
-    this.createScene();
+    this.setScene();
+    this.createAxis();
+    this.setCameraPosition();
   },
 
   methods: {
-    createScene() {
-      // Create Scene and camera
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
+    setScene() {
       // Set sizes and place it in sceneHolder
-      const renderer = new THREE.WebGLRenderer();
       renderer.setSize( window.innerWidth, window.innerHeight );
       const sceneHolder = document.querySelector('#sceneHolder');
       sceneHolder.appendChild( renderer.domElement );
 
-      this.createGrid(scene);
-
-      camera.position.z = 60;
-
       function animate() {
         requestAnimationFrame( animate );
-        renderer.render( scene, camera );
 
-        // cube.rotation.x += 0.05;
-        // cube.rotation.y += 0.05;
+        // required if controls.enableDamping or controls.autoRotate are set to true
+	      controls.update();
+
+        renderer.render( scene, camera );
 
       }
       animate();
-
     },
 
-    createGrid(scene) {
-      //Create X line
-      const matX = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    setCameraPosition() {
+      camera.position.z = 30;
+      camera.position.x = 30;
+      camera.position.y = 10;
+
+      camera.rotation.y = 0.8
+    },
+
+    createAxis() {
+      // Creating XYZ axis
+      this.createLine(0xff0000, [-10000, 0, 0], [10000, 0, 0], true)
+      this.createLine(0x00ff00, [0, -10000, 0], [0, 10000, 0], true)
+      this.createLine(0x0000ff, [0, 0, -10000], [0, 0, 10000], true)
+    },
+
+    createLine(color, coordBegin, coordEnd, dashed) {
+      if (dashed) { // For axis mostly
+        var material = new THREE.LineDashedMaterial( {
+          color: color,
+          linewidth: 1,
+          scale: 1,
+          dashSize: 1,
+          gapSize: 0.5,
+        });
+      }
+      else {
+        var material =  new THREE.LineBasicMaterial( { color: color } );
+      }
 
       const points = [];
-      points.push( new THREE.Vector3( -50, 0, 0 ) );
-      points.push( new THREE.Vector3( 50, 0, 0 ) );
+      points.push( new THREE.Vector3( coordBegin[0], coordBegin[1], coordBegin[2] ));
+      points.push( new THREE.Vector3( coordEnd[0], coordEnd[1], coordEnd[2] ));
 
       const geometry = new THREE.BufferGeometry().setFromPoints( points );
-      const line = new THREE.Line( geometry, matX );
-
-      // TO DO: CREATE Y and Z lines
+      const line = new THREE.Line( geometry, material );
+      line.computeLineDistances();
 
       scene.add( line );
     }
@@ -296,6 +318,10 @@ export default {
 
     color: var(--parameters-color);
     background: transparent;
+  }
+
+  .coordinateInputs input::placeholder {
+    text-align: center;
   }
 
   .taskButtons {

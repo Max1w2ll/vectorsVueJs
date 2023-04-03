@@ -34,16 +34,16 @@
           </div>
 
           <div class="coordinateInputs">
-            <div class="coordinatesBegin">
-              <input placeholder="X1-B">
-              <input placeholder="Y1-B">
-              <input placeholder="Z1-B">
-            </div>
-            <div class="coordinatesEnd">
-              <input placeholder="X1-E">
-              <input placeholder="Y1-E">
-              <input placeholder="Z1-E">
-            </div>
+            <form id="firstFormCheckCoordsBegin" class="coordinatesBegin">
+              <input minlength="1" required="true" type="number" id="X1-B" placeholder="X1-B">
+              <input minlength="1" required="true" type="number" id="Y1-B" placeholder="Y1-B">
+              <input minlength="1" required="true" type="number" id="Z1-B" placeholder="Z1-B">
+            </form>
+            <form id="firstFormCheckCoordsEnd" class="coordinatesEnd">
+              <input minlength="1" required="true" type="number" id="X1-E" placeholder="X1-E">
+              <input minlength="1" required="true" type="number" id="Y1-E" placeholder="Y1-E">
+              <input minlength="1" required="true" type="number" id="Z1-E" placeholder="Z1-E">
+            </form>
           </div>
 
           <div style="margin-top: 40px;" class="headerCoordinates">
@@ -53,26 +53,26 @@
           </div>
 
           <div class="coordinateInputs">
-            <div class="coordinatesBegin">
-              <input placeholder="X2-B">
-              <input placeholder="Y2-B">
-              <input placeholder="Z2-B">
-            </div>
-            <div class="coordinatesEnd">
-              <input placeholder="X2-E">
-              <input placeholder="Y2-E">
-              <input placeholder="Z2-E">
-            </div>
+            <form id="secFormCheckCoordsBegin" class="coordinatesBegin">
+              <input minlength="1" required="true" type="number" id="X2-B" placeholder="X2-B">
+              <input minlength="1" required="true" type="number" id="Y2-B" placeholder="Y2-B">
+              <input minlength="1" required="true" type="number" id="Z2-B" placeholder="Z2-B">
+            </form>
+            <form id="secFormCheckCoordsEnd" class="coordinatesEnd">
+              <input minlength="1" required="true" type="number" id="X2-E" placeholder="X2-E">
+              <input minlength="1" required="true" type="number" id="Y2-E" placeholder="Y2-E">
+              <input minlength="1" required="true" type="number" id="Z2-E" placeholder="Z2-E">
+            </form>
           </div>
         </div>
 
       </div>
 
       <div class="taskButtons">
-        <button> Сумма двух векторов </button> 
-        <button> Разность двух векторов </button> 
-        <button> Скалярное произведение двух векторов </button> 
-        <button> Угол между двумя векторами </button>  
+        <button @click="SumVectors()"> Сумма двух векторов </button> 
+        <button @click="DiffVectors()"> Разность двух векторов </button> 
+        <button @click="ScalMultVectors()"> Скалярное произведение двух векторов </button> 
+        <button @click="DegreeVectors()"> Угол между двумя векторами </button>  
       </div>
 
       <div class="executeOrClearButtons">
@@ -100,12 +100,14 @@ export default {
 
   data() {
     return {
+
     }
   },
 
   mounted() {
     this.setScene();
     this.createAxis();
+    this.createAxisText();
     this.setCameraPosition();
   },
 
@@ -143,6 +145,42 @@ export default {
       this.createLine(0x0000ff, [0, 0, -10000], [0, 0, 10000], true)
     },
 
+    createAxisText() {
+      this.createText('#ff0000', "X", [6, 1, 0], [0, 0, 0]);
+      this.createText('#00ff00', "Y", [4, 4, 0],  [0, 0, 0]);
+      this.createText('#0000ff', "Z", [0, 1, 2],  [0, 1.7, 0]);
+    },
+
+    createText(color, text, coords, rotation) {
+      const canvas = document.createElement('canvas')
+      const context = canvas.getContext('2d')
+
+      context.fillStyle = color
+      context.font = '60px sans-serif'
+      context.fillText(text, 10, 60, 10000)
+
+      // canvas contents are used for a texture
+      const texture = new THREE.Texture(canvas)
+      texture.needsUpdate = true
+
+      var material = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+      })
+      material.transparent = true
+      var mesh = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material)
+
+      mesh.position.x = coords[0];
+      mesh.position.y = coords[1];
+      mesh.position.z = coords[2];
+
+      mesh.rotation.x = rotation[0];
+      mesh.rotation.y = rotation[1];
+      mesh.rotation.z = rotation[2];
+
+      scene.add(mesh);
+    },
+
     createLine(color, coordBegin, coordEnd, dashed) {
       if (dashed) { // For axis mostly
         var material = new THREE.LineDashedMaterial( {
@@ -166,6 +204,32 @@ export default {
       line.computeLineDistances();
 
       scene.add( line );
+    },
+
+    SumVectors() {
+      this.getUserCoords();
+    },
+
+    getUserCoords() {
+      const firstFormCheckCoordsBegin = document.getElementById('firstFormCheckCoordsBegin').checkValidity();
+      const firstFormCheckCoordsEnd = document.getElementById('firstFormCheckCoordsEnd').checkValidity();
+
+      const secFormCheckCoordsBegin = document.getElementById('secFormCheckCoordsBegin').checkValidity();
+      const secFormCheckCoordsEnd = document.getElementById('secFormCheckCoordsBegin').checkValidity();
+
+      if (firstFormCheckCoordsBegin && firstFormCheckCoordsEnd && secFormCheckCoordsBegin && secFormCheckCoordsEnd) {
+        const firstLineCoordsBegin = [document.getElementById('X1-B').value, document.getElementById('Y1-B').value, document.getElementById('Z1-B').value];
+        const firstLineCoordsEnd = [document.getElementById('X1-E').value, document.getElementById('Y1-E').value, document.getElementById('Z1-E').value];
+
+        const secLineCoordsBegin = [document.getElementById('X2-B').value, document.getElementById('Y2-B').value, document.getElementById('Z2-B').value];
+        const secLineCoordsEnd = [document.getElementById('X2-E').value, document.getElementById('Y2-E').value, document.getElementById('Z2-E').value];
+
+        console.log(firstLineCoordsBegin);
+        console.log(firstLineCoordsEnd);
+
+        console.log(secLineCoordsBegin);
+        console.log(secLineCoordsEnd);
+      }
     }
   }
 }
@@ -218,6 +282,17 @@ export default {
     width: 100%;
 
     background: var(--panel-header-background);
+  }
+
+  /* No buttons on input number on all browsers */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type=number] {
+    -moz-appearance: textfield;
   }
 
   /* Left side panel */

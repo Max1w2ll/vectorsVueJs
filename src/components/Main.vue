@@ -34,34 +34,38 @@
           </div>
 
           <div class="coordinateInputs">
-            <form id="firstFormCheckCoordsBegin" class="coordinatesBegin">
-              <input minlength="1" required="true" type="number" id="X1-B" placeholder="X1-B">
-              <input minlength="1" required="true" type="number" id="Y1-B" placeholder="Y1-B">
-              <input minlength="1" required="true" type="number" id="Z1-B" placeholder="Z1-B">
-            </form>
-            <form id="firstFormCheckCoordsEnd" class="coordinatesEnd">
-              <input minlength="1" required="true" type="number" id="X1-E" placeholder="X1-E">
-              <input minlength="1" required="true" type="number" id="Y1-E" placeholder="Y1-E">
-              <input minlength="1" required="true" type="number" id="Z1-E" placeholder="Z1-E">
+            <form id="firstLineForm">
+              <div>
+                <input minlength="1" required="true" type="number" id="X1-B" placeholder="X1-B">
+                <input minlength="1" required="true" type="number" id="Y1-B" placeholder="Y1-B">
+                <input minlength="1" required="true" type="number" id="Z1-B" placeholder="Z1-B">
+              </div>
+              <div>
+                <input minlength="1" required="true" type="number" id="X1-E" placeholder="X1-E">
+                <input minlength="1" required="true" type="number" id="Y1-E" placeholder="Y1-E">
+                <input minlength="1" required="true" type="number" id="Z1-E" placeholder="Z1-E">
+              </div>
             </form>
           </div>
 
           <div style="margin-top: 40px;" class="headerCoordinates">
             <span> X </span>
             <span> Y </span>
-            <span> Y </span>
+            <span> Z </span>
           </div>
 
           <div class="coordinateInputs">
-            <form id="secFormCheckCoordsBegin" class="coordinatesBegin">
-              <input minlength="1" required="true" type="number" id="X2-B" placeholder="X2-B">
-              <input minlength="1" required="true" type="number" id="Y2-B" placeholder="Y2-B">
-              <input minlength="1" required="true" type="number" id="Z2-B" placeholder="Z2-B">
-            </form>
-            <form id="secFormCheckCoordsEnd" class="coordinatesEnd">
-              <input minlength="1" required="true" type="number" id="X2-E" placeholder="X2-E">
-              <input minlength="1" required="true" type="number" id="Y2-E" placeholder="Y2-E">
-              <input minlength="1" required="true" type="number" id="Z2-E" placeholder="Z2-E">
+            <form id="secLineForm">
+              <div>
+                <input minlength="1" required="true" type="number" id="X2-B" placeholder="X2-B">
+                <input minlength="1" required="true" type="number" id="Y2-B" placeholder="Y2-B">
+                <input minlength="1" required="true" type="number" id="Z2-B" placeholder="Z2-B">
+              </div>
+              <div>
+                <input minlength="1" required="true" type="number" id="X2-E" placeholder="X2-E">
+                <input minlength="1" required="true" type="number" id="Y2-E" placeholder="Y2-E">
+                <input minlength="1" required="true" type="number" id="Z2-E" placeholder="Z2-E">
+              </div>
             </form>
           </div>
         </div>
@@ -69,10 +73,10 @@
       </div>
 
       <div class="taskButtons">
-        <button @click="SumVectors()"> Сумма двух векторов </button> 
-        <button @click="DiffVectors()"> Разность двух векторов </button> 
-        <button @click="ScalMultVectors()"> Скалярное произведение двух векторов </button> 
-        <button @click="DegreeVectors()"> Угол между двумя векторами </button>  
+        <button @click="sumVectors()"> Сумма двух векторов </button> 
+        <button @click="diffVectors()"> Разность двух векторов </button> 
+        <button @click="scalMultVectors()"> Скалярное произведение двух векторов </button> 
+        <button @click="degreeVectors()"> Угол между двумя векторами </button>  
       </div>
 
       <div class="executeOrClearButtons">
@@ -125,24 +129,25 @@ export default {
 	      controls.update();
 
         renderer.render( scene, camera );
-
       }
       animate();
     },
 
     setCameraPosition() {
-      camera.position.z = 30;
-      camera.position.x = 30;
-      camera.position.y = 10;
+      camera.position.x = 10;
+      camera.position.y = 8;
+      camera.position.z = 10;
 
-      camera.rotation.y = 0.8
+      camera.rotation.x = -0.5
+      camera.rotation.y = 0.7
+      camera.rotation.z = 0.45
     },
 
     createAxis() {
       // Creating XYZ axis
-      this.createLine(0xff0000, [-10000, 0, 0], [10000, 0, 0], true)
-      this.createLine(0x00ff00, [0, -10000, 0], [0, 10000, 0], true)
-      this.createLine(0x0000ff, [0, 0, -10000], [0, 0, 10000], true)
+      this.createLine(0xff0000, [-10000, 0, 0, 10000, 0, 0], true)
+      this.createLine(0x00ff00, [0, -10000, 0, 0, 10000, 0], true)
+      this.createLine(0x0000ff, [0, 0, -10000, 0, 0, 10000], true)
     },
 
     createAxisText() {
@@ -181,14 +186,14 @@ export default {
       scene.add(mesh);
     },
 
-    createLine(color, coordBegin, coordEnd, dashed) {
+    createLine(color, coords, dashed) {
       if (dashed) { // For axis mostly
         var material = new THREE.LineDashedMaterial( {
           color: color,
           linewidth: 1,
           scale: 1,
           dashSize: 1,
-          gapSize: 0.5,
+          gapSize: 1,
         });
       }
       else {
@@ -196,39 +201,96 @@ export default {
       }
 
       const points = [];
-      points.push( new THREE.Vector3( coordBegin[0], coordBegin[1], coordBegin[2] ));
-      points.push( new THREE.Vector3( coordEnd[0], coordEnd[1], coordEnd[2] ));
+      points.push( new THREE.Vector3(coords[0], coords[1], coords[2])); // First three numbers - line begin
+      points.push( new THREE.Vector3(coords[3], coords[4], coords[5])); // Last three numbers - line end
 
       const geometry = new THREE.BufferGeometry().setFromPoints( points );
       const line = new THREE.Line( geometry, material );
       line.computeLineDistances();
 
-      scene.add( line );
+      scene.add(line);
     },
 
-    SumVectors() {
-      this.getUserCoords();
+    sumVectors() {
+      scene.clear();
+      this.createAxis();
+      this.createAxisText();  
+
+      let linesCoords = this.getUserCoords();
+      if (linesCoords != undefined) {
+        this.createLine(0x76a900, linesCoords.firstLine, false);
+        this.createLine(
+          0x30d5c8, 
+          [
+          linesCoords.firstLine[3], linesCoords.firstLine[4], linesCoords.firstLine[5], 
+          linesCoords.firstLine[3] + linesCoords.secLine[3] - linesCoords.secLine[0], linesCoords.firstLine[4] + linesCoords.secLine[4] - linesCoords.secLine[1], linesCoords.firstLine[5] + linesCoords.secLine[5] - linesCoords.secLine[3] 
+          ], false
+        ) // Second vector (kinda trash)
+        this.createLine(
+          0xFFC0CB, 
+          [
+          linesCoords.firstLine[0], linesCoords.firstLine[1], linesCoords.firstLine[2], 
+          linesCoords.firstLine[3] + linesCoords.secLine[3] - linesCoords.secLine[0], linesCoords.firstLine[4] + linesCoords.secLine[4] - linesCoords.secLine[1], linesCoords.firstLine[5] + linesCoords.secLine[5] - linesCoords.secLine[3] 
+          ], false
+        ) // Sum vector (kinda trash)
+      }
+    },
+
+    diffVectors() {
+      scene.clear();
+      this.createAxis();
+      this.createAxisText();
+
+      let linesCoords = this.getUserCoords();
+      if (linesCoords != undefined) {
+        this.createLine(0x76a900, linesCoords.firstLine, false);
+        this.createLine(
+          0x30d5c8, 
+          [
+          linesCoords.firstLine[0], linesCoords.firstLine[1], linesCoords.firstLine[2], 
+          linesCoords.firstLine[0] + linesCoords.secLine[3] - linesCoords.secLine[0], linesCoords.firstLine[1] + linesCoords.secLine[4] - linesCoords.secLine[1], linesCoords.firstLine[2] + linesCoords.secLine[5] - linesCoords.secLine[3] 
+          ], false
+        ) // Second vector (kinda trash)
+        this.createLine(
+          0xFFC0CB, 
+          [
+          linesCoords.firstLine[3], linesCoords.firstLine[4], linesCoords.firstLine[5], 
+          linesCoords.firstLine[0] + linesCoords.secLine[3] - linesCoords.secLine[0], linesCoords.firstLine[1] + linesCoords.secLine[4] - linesCoords.secLine[1], linesCoords.firstLine[2] + linesCoords.secLine[5] - linesCoords.secLine[3] 
+          ], false
+        ) // Diff vector (kinda trash)
+      }
+    },
+
+    scalMultVectors() {
+      scene.clear();
+      this.createAxis();
+      this.createAxisText();
+
+      this.diffVectors();
+    },
+
+    degreeVectors() {
+      scene.clear();
+      this.createAxis();
+      this.createAxisText();
+
+      this.diffVectors();
     },
 
     getUserCoords() {
-      const firstFormCheckCoordsBegin = document.getElementById('firstFormCheckCoordsBegin').checkValidity();
-      const firstFormCheckCoordsEnd = document.getElementById('firstFormCheckCoordsEnd').checkValidity();
+      const firstLineForm = document.getElementById('firstLineForm');
+      const secLineForm = document.getElementById('secLineForm');
 
-      const secFormCheckCoordsBegin = document.getElementById('secFormCheckCoordsBegin').checkValidity();
-      const secFormCheckCoordsEnd = document.getElementById('secFormCheckCoordsBegin').checkValidity();
-
-      if (firstFormCheckCoordsBegin && firstFormCheckCoordsEnd && secFormCheckCoordsBegin && secFormCheckCoordsEnd) {
-        const firstLineCoordsBegin = [document.getElementById('X1-B').value, document.getElementById('Y1-B').value, document.getElementById('Z1-B').value];
-        const firstLineCoordsEnd = [document.getElementById('X1-E').value, document.getElementById('Y1-E').value, document.getElementById('Z1-E').value];
-
-        const secLineCoordsBegin = [document.getElementById('X2-B').value, document.getElementById('Y2-B').value, document.getElementById('Z2-B').value];
-        const secLineCoordsEnd = [document.getElementById('X2-E').value, document.getElementById('Y2-E').value, document.getElementById('Z2-E').value];
-
-        console.log(firstLineCoordsBegin);
-        console.log(firstLineCoordsEnd);
-
-        console.log(secLineCoordsBegin);
-        console.log(secLineCoordsEnd);
+      if (firstLineForm.checkValidity() && secLineForm.checkValidity()) {
+        let linesCoords = {
+          firstLine: [],
+          secLine: []
+        }
+        for (let i = 0; i < 6; i++) {
+          linesCoords.firstLine.push(parseInt(firstLineForm[i].value, 10));
+          linesCoords.secLine.push(parseInt(secLineForm[i].value, 10));
+        }
+        return(linesCoords);
       }
     }
   }

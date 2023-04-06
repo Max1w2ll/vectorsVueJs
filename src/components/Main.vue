@@ -273,7 +273,7 @@ export default {
           linesCoords.firstLine[0] + linesCoords.secLine[3] - linesCoords.secLine[0], linesCoords.firstLine[1] + linesCoords.secLine[4] - linesCoords.secLine[1], linesCoords.firstLine[2] + linesCoords.secLine[5] - linesCoords.secLine[3] 
           ], false
         ) // Diff vector (kinda trash)
-        this.createText('#FFC0CB', '20px sans-serif', "Суммарный вектор", [linesCoords.firstLine[3] + linesCoords.secLine[3] - linesCoords.secLine[0], (linesCoords.firstLine[4] + linesCoords.secLine[4] - linesCoords.secLine[1])/2, (linesCoords.firstLine[5] + linesCoords.secLine[5] - linesCoords.secLine[3])/2 ], [0, 0, 0]);
+        this.createText('#FFC0CB', '20px sans-serif', "Вектор разницы", [linesCoords.firstLine[3] + linesCoords.secLine[3] - linesCoords.secLine[0], (linesCoords.firstLine[4] + linesCoords.secLine[4] - linesCoords.secLine[1])/2, (linesCoords.firstLine[5] + linesCoords.secLine[5] - linesCoords.secLine[3])/2 ], [0, 0, 0]);
 
         this.vectorLenghtCalc(linesCoords);
         this.vectorDiffCalc(linesCoords);
@@ -383,7 +383,7 @@ export default {
     },
 
     vectorDegreeCalc(linesCoords) {
-      this.solutionText += "\n Угол между векторами: \n"
+      this.solutionText += "\n Косинус угла между векторами: \n"
       this.solutionText += (
           ((linesCoords.secLine[3] - linesCoords.secLine[0]) * (linesCoords.firstLine[3] - linesCoords.firstLine[0]) +
           (linesCoords.secLine[4] - linesCoords.secLine[1]) * (linesCoords.firstLine[4] - linesCoords.firstLine[1]) +
